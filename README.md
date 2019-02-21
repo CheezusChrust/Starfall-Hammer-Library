@@ -1,6 +1,6 @@
 # Starfall Hammer Library
 ## How to set up:
-1. Open hammer and compile your map that you wish to edit in-game
+1. Open Hammer and compile your map that you wish to edit in-game
 2. Open your map in Garry's Mod
 3. Begin a session using hammer.startSession()
    - Note: You MUST be running the same version of the map in Hammer and Garry's Mod.
