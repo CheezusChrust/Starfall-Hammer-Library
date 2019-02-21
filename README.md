@@ -1,6 +1,14 @@
 # Starfall Hammer Library
+## How to set up:
+1. Open hammer and compile your map that you wish to edit in-game
+2. Open your map in Garry's Mod
+3. Begin a session using hammer.startSession()
+   - Note: You MUST be running the same version of the map in Hammer and Garry's Mod.
+4. Use whatever functions you wish to place entities in Hammer
+5. End the editing session using hammer.endSession()
+6. Your changes should appear in Hammer!
 
-## Basic usage:
+## Basic function usage:
 `hammer.sendCommand(cmd)` - Sends a command to Hammer. Arguments:
 1. `cmd` - The command to send
 
