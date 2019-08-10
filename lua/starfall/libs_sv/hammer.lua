@@ -1,6 +1,3 @@
---- Hammer library.
--- @server
-
 if not game.SinglePlayer() then return end
 
 local checktype = SF.CheckType
@@ -9,6 +6,8 @@ local mapName = game.GetMap()
 local vBSPMapVer = game.GetMapVersion()
 local mapVer = vBSPMapVer --This works for now
 
+--- Hammer library.
+-- @server
 local hammer_library = SF.RegisterLibrary("hammer")
 
 SF.AddHook("postload", function()
