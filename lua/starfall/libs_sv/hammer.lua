@@ -15,6 +15,10 @@ SF.AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
 end)
 
+SF.AddHook("deinitialize", function(instance)
+	hammer.SendCommand("session_end")
+end)
+
 function matrixToString(matrix, iscolor)
     if iscolor then
         return matrix.r.." "..matrix.g.." "..matrix.b
