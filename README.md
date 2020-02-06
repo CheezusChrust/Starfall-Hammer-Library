@@ -60,3 +60,6 @@
 2. `model` - Model of the prop
 3. `pos` - Position of the prop
 4. `ang` - Angle of the prop
+
+## Additional Info
+I made a chip to make use of these functions! Check out my [vegetation placer!](https://gist.github.com/CheezusChrust/18845f7b41b9cceb171aa52a10d19855)
