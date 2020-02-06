@@ -1,19 +1,24 @@
 if not game.SinglePlayer() then return end
-local checktype = SF.CheckType
+
 local checkluatype = SF.CheckLuaType
 local mapName = game.GetMap()
 local vBSPMapVer = game.GetMapVersion()
-local mapVer = vBSPMapVer --This works for now
---- Hammer library.
--- @server
-local hammer_library = SF.RegisterLibrary("hammer")
+local mapVer = vBSPMapVer
 
-SF.AddHook("postload", function()
-    ang_meta = SF.Angles.Metatable
-    vec_meta = SF.Vectors.Metatable
-end)
 
-SF.AddHook("deinitialize", function(instance)
+--- Library for placing and editing entities within a Hammer session
+-- @name hammer
+-- @class library
+-- @libtbl hammer_library
+SF.RegisterLibrary("hammer")
+
+return function(instance)
+
+local checktype = instance.CheckType
+local hammer_library = instance.Libraries.hammer
+local ang_meta, vec_meta = instance.Types.Angle, instance.Types.Vector
+
+instance:AddHook("deinitialize", function()
     hammer.SendCommand("session_end")
 end)
 
@@ -25,12 +30,6 @@ function matrixToString(matrix, iscolor)
     end
 end
 
---[[
-function hammer_library.toString(vec)
-    checkluatype(vec, TYPE_VECTOR)
-    return tostring(vec.x) .. " " .. tostring(vec.y) .. " " .. tostring(vec.z)
-end
---]]
 --- Sends a command.
 -- @param cmd The command to send
 -- @return True if the command was successful
@@ -240,4 +239,6 @@ function hammer_library.createProp(type, model, pos, ang)
     end
 
     return true
+end
+
 end
