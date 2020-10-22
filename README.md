@@ -56,7 +56,7 @@
 2. `endID` - Second node ID
 
 `hammer.createProp(type, model, pos, ang)` - Creates a prop. Arguments:
-1. `type` - Type of prop (physics, dynamic, dynamic_override, or static)
+1. `type` - Type of prop ("physics", "dynamic", "dynamic_override", or "static")
 2. `model` - Model of the prop
 3. `pos` - Position of the prop
 4. `ang` - Angle of the prop
