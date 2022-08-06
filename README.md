@@ -1,7 +1,7 @@
 # Starfall Hammer Library
 ## How to install:
-1. Install StarfallEx from https://github.com/thegrb93/StarfallEx (not sure why you'd be using this without it though)
-2. Download this repo and put hammer.lua into garrysmod/lua/starfall/libs_sv
+1. Install StarfallEx from https://github.com/thegrb93/StarfallEx
+2. Put this repo into your addons folder
 
 ## How to set up:
 1. Open Hammer and compile your map that you wish to edit in-game
