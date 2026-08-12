@@ -2,8 +2,7 @@ if not game.SinglePlayer() then return end
 
 local checkluatype = SF.CheckLuaType
 local mapName = game.GetMap()
-local vBSPMapVer = game.GetMapVersion()
-local mapVer = vBSPMapVer
+local mapVer = game.GetMapVersion()
 
 
 --- Library for placing and editing entities within a Hammer session
@@ -22,7 +21,7 @@ instance:AddHook("deinitialize", function()
     hammer.SendCommand("session_end")
 end)
 
-function matrixToString(matrix, iscolor)
+local function matrixToString(matrix, iscolor)
     if iscolor then
         return matrix.r .. " " .. matrix.g .. " " .. matrix.b
     else
@@ -130,7 +129,7 @@ end
 function hammer_library.rotateIncremental(class, pos, ang)
     checkluatype(class, TYPE_STRING)
     checktype(pos, vec_meta)
-    checktype(pos, ang_meta)
+    checktype(ang, ang_meta)
     pos = matrixToString(pos, false)
     ang = matrixToString(ang, false)
     local result = hammer.SendCommand("entity_rotate_incremental " .. class .. " " .. pos .. " " .. ang)
@@ -207,32 +206,44 @@ function hammer_library.removeNodeLink(startID, endID)
     end
 end
 
+local validPropClasses = {
+    physics = true,
+    dynamic = true,
+    dynamic_override = true,
+    static = true
+}
+
 --- Creates a prop.
--- @param type Type of prop (physics, dynamic, dynamic_override, or static)
+-- @param class Class of prop (physics, dynamic, dynamic_override, or static)
 -- @param model Model of the prop
 -- @param pos Position of the prop
 -- @param ang Angle of the prop
 -- @return True if the command was successful
-function hammer_library.createProp(type, model, pos, ang)
-    checkluatype(type, TYPE_STRING)
+function hammer_library.createProp(class, model, pos, ang)
+    checkluatype(class, TYPE_STRING)
+
+    if not validPropClasses[class] then
+        SF.Throw("Invalid prop class", 2)
+    end
+
     checkluatype(model, TYPE_STRING)
     checktype(pos, vec_meta)
     checktype(ang, ang_meta)
     pos = matrixToString(pos, false)
     ang = matrixToString(ang, false)
-    local result = hammer.SendCommand("entity_create prop_" .. type .. " " .. pos)
+    local result = hammer.SendCommand("entity_create prop_" .. class .. " " .. pos)
 
     if result ~= "ok" then
         SF.Throw("Prop could not be created", 2)
     end
 
-    result = hammer.SendCommand("entity_set_keyvalue prop_" .. type .. " " .. pos .. " \"model\" \"" .. model .. "\"")
+    result = hammer.SendCommand("entity_set_keyvalue prop_" .. class .. " " .. pos .. " \"model\" \"" .. model .. "\"")
 
     if result ~= "ok" then
         SF.Throw("Prop model could not be set", 2)
     end
 
-    result = hammer.SendCommand("entity_set_keyvalue prop_" .. type .. " " .. pos .. " \"angles\" \"" .. ang .. "\"")
+    result = hammer.SendCommand("entity_set_keyvalue prop_" .. class .. " " .. pos .. " \"angles\" \"" .. ang .. "\"")
 
     if result ~= "ok" then
         SF.Throw("Prop angles could not be set", 2)
