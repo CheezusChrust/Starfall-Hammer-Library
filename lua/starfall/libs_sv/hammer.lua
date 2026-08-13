@@ -21,12 +21,16 @@ instance:AddHook("deinitialize", function()
     hammer.SendCommand("session_end")
 end)
 
-local function matrixToString(matrix, iscolor)
-    if iscolor then
-        return matrix.r .. " " .. matrix.g .. " " .. matrix.b
-    else
-        return matrix[1] .. " " .. matrix[2] .. " " .. matrix[3]
+local function matrixToString(matrix)
+    return matrix[1] .. " " .. matrix[2] .. " " .. matrix[3]
+end
+
+local function send(cmd, msgOnFail)
+    if hammer.SendCommand(cmd) ~= "ok" then
+        SF.Throw(msgOnFail, 3)
     end
+
+    return true
 end
 
 --- Sends a command.
@@ -34,13 +38,8 @@ end
 -- @return True if the command was successful
 function hammer_library.sendCommand(cmd)
     checkluatype(cmd, TYPE_STRING)
-    local result = hammer.SendCommand(cmd)
 
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("Bad command", 2)
-    end
+    return send(cmd, "Bad command")
 end
 
 --- Starts an editing session.
@@ -57,13 +56,7 @@ end
 --- Ends an editing session.
 -- @return True if the command was successful
 function hammer_library.endSession()
-    local result = hammer.SendCommand("session_end")
-
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("No session to be ended", 2)
-    end
+    return send("session_end", "No session to be ended")
 end
 
 --- Creates an entity.
@@ -73,14 +66,8 @@ end
 function hammer_library.createEntity(class, pos)
     checkluatype(class, TYPE_STRING)
     checktype(pos, vec_meta)
-    pos = matrixToString(pos, false)
-    local result = hammer.SendCommand("entity_create " .. class .. " " .. pos)
-
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("Entity could not be created", 2)
-    end
+    pos = matrixToString(pos)
+    return send("entity_create " .. class .. " " .. pos, "Entity could not be created")
 end
 
 --- Removes an entity.
@@ -90,14 +77,9 @@ end
 function hammer_library.removeEntity(class, pos)
     checkluatype(class, TYPE_STRING)
     checktype(pos, vec_meta)
-    pos = matrixToString(pos, false)
-    local result = hammer.SendCommand("entity_delete " .. class .. " " .. pos)
+    pos = matrixToString(pos)
 
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("Entity could not be removed", 2)
-    end
+    return send("entity_delete " .. class .. " " .. pos, "Entity could not be removed")
 end
 
 --- Sets an entity's KeyValue pair.
@@ -111,14 +93,9 @@ function hammer_library.setKeyValue(class, pos, key, value)
     checktype(pos, vec_meta)
     checkluatype(key, TYPE_STRING)
     checkluatype(value, TYPE_STRING)
-    pos = matrixToString(pos, false)
-    local result = hammer.SendCommand("entity_set_keyvalue " .. class .. " " .. pos .. " \"" .. key .. "\" \"" .. value .. "\"")
+    pos = matrixToString(pos)
 
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("KeyValue could not be set", 2)
-    end
+    return send("entity_set_keyvalue " .. class .. " " .. pos .. " \"" .. key .. "\" \"" .. value .. "\"", "KeyValue could not be set")
 end
 
 --- Incrementally rotates an entity.
@@ -130,16 +107,13 @@ function hammer_library.rotateIncremental(class, pos, ang)
     checkluatype(class, TYPE_STRING)
     checktype(pos, vec_meta)
     checktype(ang, ang_meta)
-    pos = matrixToString(pos, false)
-    ang = matrixToString(ang, false)
-    local result = hammer.SendCommand("entity_rotate_incremental " .. class .. " " .. pos .. " " .. ang)
+    pos = matrixToString(pos)
+    ang = matrixToString(ang)
 
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("Entity could not be rotated", 2)
-    end
+    return send("entity_rotate_incremental " .. class .. " " .. pos .. " " .. ang, "Entity could not be rotated")
 end
+
+local floor = math.floor
 
 --- Creates an AI node.
 -- @param class Class of the node
@@ -149,15 +123,13 @@ end
 function hammer_library.createNode(class, id, pos)
     checkluatype(class, TYPE_STRING)
     checkluatype(id, TYPE_NUMBER)
-    checktype(pos, vec_meta)
-    pos = matrixToString(pos, false)
-    local result = hammer.SendCommand("node_create " .. class .. " " .. id .. " " .. pos)
 
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("Node could not be created", 2)
-    end
+    id = floor(id)
+
+    checktype(pos, vec_meta)
+    pos = matrixToString(pos)
+
+    return send("node_create " .. class .. " " .. id .. " " .. pos, "Node could not be created")
 end
 
 --- Removes an AI node.
@@ -165,13 +137,10 @@ end
 -- @return True if the command was successful
 function hammer_library.removeNode(id)
     checkluatype(id, TYPE_NUMBER)
-    local result = hammer.SendCommand("node_delete " .. id)
 
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("Node could not be removed", 2)
-    end
+    id = floor(id)
+
+    return send("node_delete " .. id, "Node could not be removed")
 end
 
 --- Creates a link between two AI nodes.
@@ -181,13 +150,11 @@ end
 function hammer_library.createNodeLink(startID, endID)
     checkluatype(startID, TYPE_NUMBER)
     checkluatype(endID, TYPE_NUMBER)
-    local result = hammer.SendCommand("nodelink_create " .. startID .. " " .. endID)
 
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("Nodes could not be linked", 2)
-    end
+    startID = floor(startID)
+    endID = floor(endID)
+
+    return send("nodelink_create " .. startID .. " " .. endID, "Nodes could not be linked")
 end
 
 --- Removes a link between two AI nodes.
@@ -197,13 +164,11 @@ end
 function hammer_library.removeNodeLink(startID, endID)
     checkluatype(startID, TYPE_NUMBER)
     checkluatype(endID, TYPE_NUMBER)
-    local result = hammer.SendCommand("nodelink_delete " .. startID .. " " .. endID)
 
-    if result == "ok" then
-        return true
-    else
-        SF.Throw("Nodes could not be unlinked", 2)
-    end
+    startID = floor(startID)
+    endID = floor(endID)
+
+    return send("nodelink_delete " .. startID .. " " .. endID, "Nodes could not be unlinked")
 end
 
 local validPropClasses = {
@@ -229,27 +194,14 @@ function hammer_library.createProp(class, model, pos, ang)
     checkluatype(model, TYPE_STRING)
     checktype(pos, vec_meta)
     checktype(ang, ang_meta)
-    pos = matrixToString(pos, false)
-    ang = matrixToString(ang, false)
-    local result = hammer.SendCommand("entity_create prop_" .. class .. " " .. pos)
 
-    if result ~= "ok" then
-        SF.Throw("Prop could not be created", 2)
-    end
+    pos = matrixToString(pos)
+    ang = matrixToString(ang)
 
-    result = hammer.SendCommand("entity_set_keyvalue prop_" .. class .. " " .. pos .. " \"model\" \"" .. model .. "\"")
+    send("entity_create prop_" .. class .. " " .. pos, "Prop could not be created")
+    send("entity_set_keyvalue prop_" .. class .. " " .. pos .. " \"model\" \"" .. model .. "\"", "Prop model could not be set")
 
-    if result ~= "ok" then
-        SF.Throw("Prop model could not be set", 2)
-    end
-
-    result = hammer.SendCommand("entity_set_keyvalue prop_" .. class .. " " .. pos .. " \"angles\" \"" .. ang .. "\"")
-
-    if result ~= "ok" then
-        SF.Throw("Prop angles could not be set", 2)
-    end
-
-    return true
+    return send("entity_set_keyvalue prop_" .. class .. " " .. pos .. " \"angles\" \"" .. ang .. "\"", "Prop angles could not be set")
 end
 
 end
